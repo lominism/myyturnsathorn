@@ -1,0 +1,701 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Myyturn Sathorn</title>
+    <script src="https://static.line-scdn.net/liff/edge/2/sdk.js"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css">
+    <style>
+        :root {
+            --primary: #06C755;
+            --primary-dark: #05a546;
+            --bg: #f4f6f8;
+            --card-bg: #ffffff;
+            --text-dark: #2c3e50;
+            --text-light: #95a5a6;
+            --border: #e0e0e0;
+            --radius: 16px;
+            --shadow: 0 4px 20px rgba(0, 0, 0, 0.05);
+        }
+
+        body {
+            font-family: 'Poppins', sans-serif;
+            background-color: var(--bg);
+            margin: 0;
+            padding: 20px;
+            color: var(--text-dark);
+        }
+
+        .container {
+            max-width: 480px;
+            margin: 0 auto;
+            background: var(--card-bg);
+            padding: 24px;
+            border-radius: var(--radius);
+            box-shadow: var(--shadow);
+        }
+
+        h2 {
+            margin: 0 0 5px 0;
+            font-weight: 600;
+            color: var(--text-dark);
+        }
+
+        p.subtitle {
+            margin: 0 0 25px 0;
+            color: var(--text-light);
+            font-size: 14px;
+        }
+
+        label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 600;
+            font-size: 14px;
+            color: var(--text-dark);
+        }
+
+        /* Stylist Selection */
+        .stylist-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 10px;
+            margin-bottom: 25px;
+        }
+
+        .stylist-card {
+            background: white;
+            border: 2px solid var(--border);
+            border-radius: 12px;
+            padding: 15px;
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .stylist-card.active {
+            border-color: var(--primary);
+            background-color: rgba(6, 199, 85, 0.05);
+            color: var(--primary);
+        }
+
+        .stylist-card i {
+            display: block;
+            font-size: 24px;
+            margin-bottom: 8px;
+        }
+
+        /* Gender Selection */
+        .gender-group {
+            display: flex;
+            gap: 20px;
+            margin-bottom: 25px;
+        }
+        .gender-group label {
+            font-weight: normal;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            cursor: pointer;
+            margin: 0;
+            font-size: 15px;
+        }
+        
+        /* Service Selection */
+        .service-list {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+            margin-bottom: 25px;
+        }
+
+        .service-pill {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 14px 20px;
+            background: white;
+            border: 1px solid var(--border);
+            border-radius: 12px;
+            font-size: 15px;
+            cursor: pointer;
+            transition: all 0.2s;
+            color: var(--text-dark);
+        }
+
+        .service-pill.active {
+            background: var(--primary);
+            color: white;
+            border-color: var(--primary);
+            box-shadow: 0 4px 10px rgba(6, 199, 85, 0.3);
+        }
+        .service-pill.active span {
+            color: white !important;
+        }
+
+        /* Date Picker */
+        .input-group {
+            margin-bottom: 25px;
+            position: relative;
+        }
+
+        input[type="text"], input[type="tel"] {
+            width: 100%;
+            padding: 14px;
+            border: 2px solid var(--border);
+            border-radius: 12px;
+            font-family: 'Poppins', sans-serif;
+            font-size: 15px;
+            box-sizing: border-box;
+            background: white;
+            cursor: pointer;
+        }
+        
+        input[type="text"]:focus {
+            outline: none;
+            border-color: var(--primary);
+        }
+
+        /* Time Slots Grid */
+        #timeSlotContainer {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 10px;
+            margin-bottom: 30px;
+        }
+
+        .time-btn {
+            padding: 12px;
+            background: white;
+            border: 2px solid var(--border);
+            border-radius: 8px;
+            text-align: center;
+            font-size: 14px;
+            cursor: pointer;
+            transition: all 0.2s;
+            color: var(--text-dark);
+        }
+        
+        .time-btn.available {
+            border-color: #06C755;
+            color: #06C755;
+        }
+
+        .time-btn.available:hover {
+            background-color: #e6f9ed;
+        }
+
+        .time-btn.unavailable {
+            border-color: #FF4B4B;
+            color: #ccc;
+            cursor: not-allowed;
+            opacity: 0.6;
+        }
+
+        .time-btn.selected {
+            background: var(--primary);
+            color: white;
+            border-color: var(--primary);
+        }
+
+        /* Main Button */
+        #submitBtn {
+            width: 100%;
+            padding: 16px;
+            background: var(--primary);
+            color: white;
+            border: none;
+            border-radius: 12px;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: background 0.2s;
+            box-shadow: 0 4px 15px rgba(6, 199, 85, 0.3);
+        }
+
+        #submitBtn:active {
+            transform: scale(0.98);
+        }
+        
+        #loading {
+            display: none;
+            text-align: center;
+            color: var(--text-light);
+            margin-top: 15px;
+        }
+
+        /* Loader */
+        .spinner {
+            display: inline-block;
+            width: 20px;
+            height: 20px;
+            border: 3px solid rgba(255,255,255,0.3);
+            border-radius: 50%;
+            border-top-color: #fff;
+            animation: spin 1s ease-in-out infinite;
+            margin-right: 8px;
+            vertical-align: middle;
+        }
+        
+        @keyframes spin {
+          to { transform: rotate(360deg); }
+        }
+
+        /* Calendar Status Dots */
+        .flatpickr-day { position: relative; }
+        .dot-marker {
+            width: 6px;
+            height: 6px;
+            border-radius: 50%;
+            position: absolute;
+            bottom: 4px;
+            left: 50%;
+            transform: translateX(-50%);
+        }
+        .dot-green { background-color: #06C755; }
+        .dot-yellow { background-color: #FFC107; }
+        .dot-red { background-color: #FF4B4B; }
+
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h2>Myyturn Sathorn</h2>
+        <div id="welcomeMessage" style="font-weight: 600; font-size: 14px; margin-bottom: 20px; display: none;"></div>
+        <button id="liffLoginBtn" style="display: none; margin-bottom: 20px;" onclick="liff.login()">Log in with LINE to Book</button>
+        
+        <!-- Hidden Inputs for Form Submission -->
+        <input type="hidden" id="lineUserId" value="">
+        <input type="hidden" id="genderInput" value="M">
+        <input type="hidden" id="stylistInput" value="Louis">
+        <input type="hidden" id="serviceInput" value="">
+        <input type="hidden" id="durationInput" value="">
+        <input type="hidden" id="timeInput" value="">
+        <input type="hidden" id="dateInput" value="">
+
+        <label>Your Details</label>
+        <div class="input-group" style="margin-bottom: 15px;">
+            <input type="text" id="nameInput" placeholder="Your Name">
+        </div>
+        <div class="input-group" style="margin-bottom: 20px;">
+            <input type="tel" id="phoneInput" placeholder="Phone Number (e.g. 0812345678)">
+        </div>
+
+        <label>Gender</label>
+        <div class="gender-group">
+            <label><input type="radio" name="gender" value="M" checked onchange="selectGender('M')"> Men hair cut</label>
+            <label><input type="radio" name="gender" value="F" onchange="selectGender('F')"> Women hair cut</label>
+        </div>
+
+        <label>Choose Stylist</label>
+        <div class="stylist-grid">
+            <div class="stylist-card active" onclick="selectStylist('Louis', this)">
+                <i class="fas fa-user-tie"></i>
+                <div>Louis</div>
+            </div>
+            <div class="stylist-card" onclick="selectStylist('Mos', this)">
+                <i class="fas fa-user-tie"></i>
+                <div>Mos</div>
+            </div>
+            <div class="stylist-card" onclick="selectStylist('Benz', this)">
+                <i class="fas fa-user-tie"></i>
+                <div>Benz</div>
+            </div>
+            <div class="stylist-card" onclick="selectStylist('Mile', this)">
+                <i class="fas fa-user-tie"></i>
+                <div>Mile</div>
+            </div>
+            <div class="stylist-card" onclick="selectStylist('Prame', this)">
+                <i class="fas fa-user-tie"></i>
+                <div>Prame</div>
+            </div>
+        </div>
+
+        <label>Service</label>
+        <div class="service-list" id="serviceListContainer">
+            <!-- Dynamically populated -->
+        </div>
+
+        <label>Select Date</label>
+        <div class="input-group">
+            <input type="text" id="datePicker" placeholder="Select a date...">
+        </div>
+
+        <label>Available Times</label>
+        <div id="timeSlotContainer">
+            <div style="grid-column: 1/-1; text-align: center; color: #999; font-size: 14px;">Select a date to see times</div>
+        </div>
+
+        <div id="formError" style="color: #FF4B4B; background: #ffebeb; padding: 12px; border-radius: 8px; margin-bottom: 20px; font-size: 14px; text-align: center; display: none; font-weight: 500;"></div>
+
+        <button id="submitBtn" onclick="submitBooking()">Book Appointment</button>
+        <p id="loading"><i class="fas fa-spinner fa-spin"></i> Processing...</p>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/flatpickr"></script>
+    <script>
+        // State
+        const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbwQIWGxanBEp-Y_mgmZwM-fuKOUQWAke2tM-X8sgJ0PcW0Xcpg1LGrLQ91rney5agK-Sw/exec"; 
+        let calendarStatusMap = {}; // "2024-03-01": "green"
+        let currentMonth = new Date().getMonth();
+        let currentYear = new Date().getFullYear();
+        let fpInstance = null;
+        let selectedServices = []; // Array of {name: "Cut", duration: 60}
+
+        // 1. Initialize LIFF to get User ID
+        async function initLiff() {
+            try {
+                await liff.init({ liffId: "2009535614-MwZCCysW" });
+                const welcomeDiv = document.getElementById('welcomeMessage');
+                
+                if (liff.isLoggedIn()) {
+                    const profile = await liff.getProfile();
+                    document.getElementById('lineUserId').value = profile.userId;
+                    
+                    // Show Welcome Message
+                    welcomeDiv.innerText = "Welcome, " + profile.displayName;
+                    welcomeDiv.style.display = "block";
+                    welcomeDiv.style.color = "#05a546";
+                    
+                    // Pre-fill name
+                    if (!document.getElementById('nameInput').value) {
+                        document.getElementById('nameInput').value = profile.displayName;
+                    }
+                } else {
+                    // Always show the login button. Google Apps Script iframes block automatic liff.login() redirects.
+                    welcomeDiv.innerText = "Please log in with LINE to book.";
+                    welcomeDiv.style.display = "block";
+                    welcomeDiv.style.color = "#e67e22";
+                    document.getElementById('liffLoginBtn').style.display = "block";
+                }
+            } catch (err) {
+                console.error("LIFF failed", err);
+                const welcomeDiv = document.getElementById('welcomeMessage');
+                welcomeDiv.innerText = "LIFF Error: " + err.message;
+                welcomeDiv.style.display = "block";
+                welcomeDiv.style.color = "#e74c3c";
+            }
+        }
+        
+        window.addEventListener('DOMContentLoaded', () => {
+            initLiff();
+            renderServices();
+        });
+
+        const SERVICE_DATA = {
+            Louis: {
+                M: { "Men cut": "1 hrs", "Down perm,Oppalock": "30 mins", "Perm men": "1 hrs", "Straightening men": "2 hrs", "Natural color men": "1 hrs", "Bleach color men": "4 hrs", "Men highlight color": "4 hrs", "Bangs trim": "30 mins" },
+                F: { "Women cut": "2 hrs", "Perm women": "2 hrs", "Straightening women": "2 hrs", "Natural color women": "2 hrs", "Bleach color women": "5 hrs", "Women highlight color": "6 hrs", "Bangs trim": "30 mins" }
+            },
+            Mos: {
+                M: { "Men cut": "1 hrs", "Down perm,Oppalock": "30 mins", "Perm men": "1 hrs", "Straightening men": "2 hrs", "Natural color men": "1 hrs", "Bleach color men": "4 hrs", "Men highlight color": "4 hrs", "Bangs trim": "30 mins" },
+                F: { "Women cut": "1.30 hrs", "Perm women": "2 hrs", "Straightening women": "2 hrs", "Natural color women": "2 hrs", "Bleach color women": "5 hrs", "Women highlight color": "6 hrs", "Bangs trim": "30 mins" }
+            },
+            Benz: {
+                M: { "Men cut": "1 hrs", "Down perm,Oppalock": "30 mins", "Perm men": "1 hrs", "Straightening men": "2 hrs", "Natural color men": "1 hrs", "Bleach color men": "4 hrs", "Men highlight color": "4 hrs", "Bangs trim": "30 mins" },
+                F: { "Women cut": "1.30 hrs", "Perm women": "2 hrs", "Straightening women": "2 hrs", "Natural color women": "2 hrs", "Bleach color women": "5 hrs", "Women highlight color": "6 hrs", "Bangs trim": "30 mins" }
+            },
+            Mile: {
+                M: { "Men cut": "1 hrs", "Down perm,Oppalock": "30 mins", "Perm men": "1 hrs", "Straightening men": "2 hrs", "Natural color men": "1 hrs", "Bleach color men": "4 hrs", "Men highlight color": "4 hrs", "Bangs trim": "30 mins" },
+                F: {}
+            },
+            Prame: {
+                M: { "Men cut": "1 hrs", "Down perm,Oppalock": "30 mins", "Perm men": "1 hrs", "Straightening men": "2 hrs", "Natural color men": "1 hrs", "Bleach color men": "4 hrs", "Men highlight color": "4 hrs", "Bangs trim": "30 mins" },
+                F: {}
+            }
+        };
+
+        function renderServices() {
+            const stylist = document.getElementById('stylistInput').value;
+            const gender = document.getElementById('genderInput').value;
+            const container = document.getElementById('serviceListContainer');
+            
+            const services = SERVICE_DATA[stylist] && SERVICE_DATA[stylist][gender] ? SERVICE_DATA[stylist][gender] : {};
+            
+            let html = '';
+            for (const [serviceName, durationStr] of Object.entries(services)) {
+                // Parse duration string into minutes
+                let minutes = 60;
+                if (durationStr.includes('.')) {
+                    const parts = durationStr.split(' ')[0].split('.');
+                    minutes = parseInt(parts[0]) * 60 + parseInt(parts[1]);
+                } else if (durationStr.includes('mins')) {
+                    minutes = parseInt(durationStr);
+                } else if (durationStr.includes('hr') || durationStr.includes('hrs')) {
+                    minutes = parseInt(durationStr) * 60;
+                }
+
+                html += `<div class="service-pill" onclick="selectService('${serviceName}', ${minutes}, this)">
+                    <span style="font-weight: 500;">${serviceName}</span>
+                    <span style="color: #95a5a6; font-size: 13px; font-weight: 500;">${durationStr}</span>
+                </div>`;
+            }
+
+            if(Object.keys(services).length === 0) {
+                html = `<div style="text-align: center; color: #95a5a6; padding: 15px; border: 1px dashed var(--border); border-radius: 12px; font-size: 14px;">No services available for this selection.</div>`;
+            }
+            
+            container.innerHTML = html;
+            
+            // clear selected services if stylist or gender changes
+            selectedServices = [];
+            document.getElementById('serviceInput').value = '';
+            document.getElementById('durationInput').value = '';
+            
+            // Re-apply visually if somehow kept, but we cleared it, so no active pills.
+            // Let the user select manually so they know what they are booking.
+        }
+
+        // 2. UI Setters
+        function selectGender(val) {
+            document.getElementById('genderInput').value = val;
+            renderServices();
+            checkTimes();
+        }
+
+        function selectStylist(name, el) {
+            document.getElementById('stylistInput').value = name;
+            
+            // Visual Update
+            document.querySelectorAll('.stylist-card').forEach(c => c.classList.remove('active'));
+            el.classList.add('active');
+
+            // Logic Update
+            renderServices();
+            fetchMonthStatus(currentYear, currentMonth); // Refresh calendar colors
+            checkTimes(); // Refresh times if date passed
+        }
+
+        function selectService(name, durationMinutes, el) {
+            if (!name) return;
+            
+            // Check if already selected
+            const existingIndex = selectedServices.findIndex(s => s.name === name);
+            if (existingIndex > -1) {
+                // Deselect
+                selectedServices.splice(existingIndex, 1);
+                if(el) el.classList.remove('active');
+            } else {
+                // Select
+                selectedServices.push({name: name, duration: durationMinutes});
+                if(el) el.classList.add('active');
+            }
+
+            // Aggregate totals
+            const names = selectedServices.map(s => s.name).join(", ");
+            const totalDuration = selectedServices.reduce((acc, curr) => acc + curr.duration, 0);
+
+            document.getElementById('serviceInput').value = names;
+            document.getElementById('durationInput').value = totalDuration;
+
+            // Logic Update
+            checkTimes(); // Different services might have different slot availability
+        }
+
+        function selectTime(time, el) {
+            if (el.classList.contains('disabled')) return;
+
+            document.getElementById('timeInput').value = time;
+            
+            document.querySelectorAll('.time-btn').forEach(btn => btn.classList.remove('selected'));
+            el.classList.add('selected');
+        }
+
+        // 3. Calendar & Availability Logic
+        function fetchMonthStatus(year, month) {
+            const stylist = document.getElementById('stylistInput').value;
+            if (!stylist) return;
+            
+            // Call Backend via Fetch
+            fetch(`${SCRIPT_URL}?action=getMonthStatus&stylist=${encodeURIComponent(stylist)}&year=${year}&month=${month}`)
+                .then(res => res.json())
+                .then(statusMap => {
+                    calendarStatusMap = statusMap;
+                    if (fpInstance) fpInstance.redraw(); // Redraw calendar to show dots
+                })
+                .catch(err => console.error("Calendar fetch error:", err));
+        }
+
+        // Initialize Flatpickr
+        fpInstance = flatpickr("#datePicker", {
+            minDate: "today",
+            dateFormat: "Y-m-d", // Matches 'yyyy-MM-dd' from backend
+            disableMobile: "true", // Force custom UI on mobile
+            onMonthChange: function(selectedDates, dateStr, instance) {
+                currentMonth = instance.currentMonth;
+                currentYear = instance.currentYear;
+                fetchMonthStatus(currentYear, currentMonth);
+            },
+            onDayCreate: function(dObj, dStr, fp, dayElem) {
+                // Clear existing dots safely
+                let existingDot = dayElem.querySelector('.dot-marker');
+                if (existingDot) existingDot.remove();
+                
+                // Construct YYYY-MM-DD manually to avoid timezone shifts
+                let year = dayElem.dateObj.getFullYear();
+                let month = (dayElem.dateObj.getMonth() + 1).toString().padStart(2, '0');
+                let day = dayElem.dateObj.getDate().toString().padStart(2, '0');
+                let key = `${year}-${month}-${day}`;
+
+                let status = calendarStatusMap[key];
+                
+                // Only show dots if we have status data (don't show for next month days if we haven't fetched them)
+                // Defaulting to green might be misleading if data hasn't loaded yet.
+                // But simplified approach: if it's undefined, assume it's available (Green) or loading.
+                if (status === undefined) status = 'green'; 
+                
+                if (!dayElem.classList.contains('prevMonthDay') && !dayElem.classList.contains('nextMonthDay')) {
+                     let dot = document.createElement('span');
+                     dot.className = `dot-marker dot-${status}`;
+                     dayElem.appendChild(dot);
+                }
+            },
+            onChange: function(selectedDates, dateStr) {
+                document.getElementById('dateInput').value = dateStr;
+                checkTimes();
+            }
+        });
+
+        // Initial fetch
+        fetchMonthStatus(currentYear, currentMonth);
+
+        // 4. Time Slots
+        function checkTimes() {
+            const stylist = document.getElementById('stylistInput').value;
+            const date = document.getElementById('dateInput').value;
+            const durationMinsStr = document.getElementById('durationInput').value;
+            const container = document.getElementById('timeSlotContainer');
+
+            if (!date || !durationMinsStr) return;
+            
+            const durationMins = parseInt(durationMinsStr, 10) || 60;
+
+            container.innerHTML = '<div style="grid-column: 1/-1; text-align: center;"><i class="fas fa-spinner fa-spin"></i> Checking availability...</div>';
+
+            fetch(`${SCRIPT_URL}?action=getAvailableTimes&stylist=${encodeURIComponent(stylist)}&date=${encodeURIComponent(date)}&duration=${durationMins}`)
+                .then(res => res.json())
+                .then(allSlots => {
+                    container.innerHTML = '';
+                    
+                    allSlots.forEach(slotObj => {
+                        let btn = document.createElement('div');
+                        let time = slotObj.time;
+                        btn.innerText = time;
+                        
+                        if (slotObj.available) {
+                             btn.className = 'time-btn available';
+                             btn.onclick = function() { selectTime(time, btn); };
+                             
+                             // Restore selection
+                             if (document.getElementById('timeInput').value === time) {
+                                 btn.classList.add('selected');
+                             }
+                        } else {
+                             btn.className = 'time-btn unavailable';
+                        }
+                        
+                        container.appendChild(btn);
+                    });
+                })
+                .catch(err => {
+                    console.error("Error loading times:", err);
+                    container.innerHTML = '<div style="grid-column: 1/-1; text-align: center; color: red;">Failed to load</div>';
+                });
+        }
+
+        // 5. Submit
+        function submitBooking() {
+            const stylist = document.getElementById('stylistInput').value;
+            const service = document.getElementById('serviceInput').value;
+            const durationMinsStr = document.getElementById('durationInput').value;
+            const date = document.getElementById('dateInput').value;
+            const time = document.getElementById('timeInput').value;
+            
+            // New Inputs
+            const name = document.getElementById('nameInput').value.trim();
+            const phone = document.getElementById('phoneInput').value.trim();
+            const gender = document.getElementById('genderInput').value;
+            const lineUserId = document.getElementById('lineUserId').value;
+
+            const btn = document.getElementById("submitBtn");
+            const loading = document.getElementById("loading");
+            const errDiv = document.getElementById("formError");
+            
+            // Helper to show error
+            const showError = (msg) => {
+                errDiv.innerText = msg;
+                errDiv.style.display = "block";
+                errDiv.scrollIntoView({ behavior: 'smooth', block: 'center' });
+            };
+            
+            errDiv.style.display = "none"; // Hide previous errors
+
+            // Validation
+            if (!name) {
+                showError("Please enter your name.");
+                return;
+            }
+            if (!phone) {
+                showError("Please enter your phone number.");
+                return;
+            }
+            if (!lineUserId) {
+                showError("Please log in with LINE first! Use the button at the top.");
+                return;
+            }
+            if (selectedServices.length === 0 || !service) {
+                showError("Please select at least one service.");
+                return;
+            }
+            if (!date || !time) {
+                showError("Please select a date and time.");
+                return;
+            }
+
+            const bookingData = {
+                name: name,
+                phone: phone,
+                gender: gender,
+                stylist: stylist,
+                date: date,
+                time: time,
+                service: service,
+                duration: parseInt(durationMinsStr, 10) || 60,
+                lineUserId: lineUserId
+            };
+
+            // UI Loading state
+            btn.innerHTML = '<span class="spinner"></span> Booking...';
+            btn.disabled = true;
+            btn.style.opacity = "0.7";
+            loading.style.display = "block";
+
+            fetch(SCRIPT_URL, {
+                method: "POST",
+                headers: { "Content-Type": "text/plain;charset=utf-8" },
+                body: JSON.stringify(bookingData)
+            })
+            .then(res => res.json())
+            .then(data => {
+                if (data.success) {
+                    // Send user to success page passing the booking string to display
+                    window.location.href = `success.html?details=${encodeURIComponent(data.details)}`;
+                } else {
+                    throw new Error(data.error || "Unknown server error");
+                }
+            })
+            .catch(err => {
+                errDiv.innerText = "Booking failed: " + err.message;
+                errDiv.style.display = "block";
+                btn.innerHTML = "Book Appointment";
+                btn.disabled = false;
+                btn.style.opacity = "1";
+                loading.style.display = "none";
+                checkTimes(); // Refresh times
+            });
+        }
+    </script>
+</body>
+</html>

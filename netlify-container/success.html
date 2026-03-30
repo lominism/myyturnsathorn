@@ -1,0 +1,70 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Myyturn Sathorn</title>
+    <!-- Optional: Fallback close logic -->
+    <script src="https://static.line-scdn.net/liff/edge/2/sdk.js"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600&display=swap" rel="stylesheet">
+    <style>
+        body { margin: 0; padding: 20px; font-family: 'Poppins', sans-serif; background: #f4f6f8; display: flex; align-items: center; justify-content: center; min-height: 100vh; }
+        .container { background: #fff; padding: 40px 30px; border-radius: 16px; box-shadow: 0 4px 20px rgba(0,0,0,0.05); text-align: center; max-width: 400px; width: 100%; }
+        .success-icon { width: 80px; height: 80px; background: #e8f5e9; color: #06C755; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 32px; margin: 0 auto 20px; }
+        h1 { margin: 0 0 10px; color: #2c3e50; font-size: 24px; }
+        p { color: #5aa6a6; margin: 0 0 20px; font-size: 14px; line-height: 1.5; }
+        .details-box { background: #f8f9fa; border: 1px solid #e0e0e0; border-radius: 12px; padding: 20px; text-align: left; font-size: 14px; color: #34495e; white-space: pre-line; line-height: 1.6; word-break: break-word; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="success-icon">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" style="width: 40px; height: 40px;">
+                <polyline points="20 6 9 17 4 12"></polyline>
+            </svg>
+        </div>
+        <h1>Booking Made</h1>
+        <p>You have successfully made your appointment. Please wait for admin to make final confirmation.</p>
+        <div class="details-box" id="detailsBox">Loading details...</div>
+        <p style="margin-top: 25px; color: #7f8c8d; font-size: 13px;" id="countdownMessage">Window will close automatically in 3 seconds...</p>
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', async () => {
+            const params = new URLSearchParams(window.location.search);
+            const details = params.get('details');
+
+            if (details) {
+                document.getElementById('detailsBox').innerText = details;
+            } else {
+                document.getElementById('detailsBox').innerText = "Booking confirmed! Awaiting admin approval.";
+            }
+
+            // Countdown and Close Logic
+            try {
+                await liff.init({ liffId: "2009535614-MwZCCysW" });
+                
+                let secondsLeft = 3;
+                const counterElement = document.getElementById('countdownMessage');
+                
+                const timer = setInterval(() => {
+                    secondsLeft--;
+                    if (secondsLeft > 0) {
+                        counterElement.innerText = `Window will close automatically in ${secondsLeft} seconds...`;
+                    } else {
+                        clearInterval(timer);
+                        counterElement.innerText = "Closing window...";
+                        if (liff.isInClient()) {
+                            liff.closeWindow();
+                        }
+                    }
+                }, 1000);
+                
+            } catch (err) {
+                console.error("LIFF SDK error:", err);
+                // If LIFF fails, fallback to standard window close (often blocked by browsers, but good practice)
+                setTimeout(() => { window.close(); }, 3000);
+            }
+        });
+    </script>
+</body>
+</html>
