@@ -269,7 +269,7 @@
         <!-- Hidden Inputs for Form Submission -->
         <input type="hidden" id="lineUserId" value="">
         <input type="hidden" id="genderInput" value="M">
-        <input type="hidden" id="stylistInput" value="Louis">
+        <input type="hidden" id="stylistInput" value="">
         <input type="hidden" id="serviceInput" value="">
         <input type="hidden" id="durationInput" value="">
         <input type="hidden" id="timeInput" value="">
@@ -285,13 +285,20 @@
 
         <label>Gender</label>
         <div class="gender-group">
-            <label><input type="radio" name="gender" value="M" checked onchange="selectGender('M')"> Men hair cut</label>
-            <label><input type="radio" name="gender" value="F" onchange="selectGender('F')"> Women hair cut</label>
+            <label><input type="radio" name="gender" value="M" checked onchange="selectGender('M')"> Men's Hairstyles</label>
+            <label><input type="radio" name="gender" value="F" onchange="selectGender('F')"> Women's Hairstyles</label>
+        </div>
+
+        <div style="text-align: center; margin-bottom: 25px;">
+            <div class="stylist-card" onclick="selectStylist('Wash&Dry', this)" style="display: inline-block; width: 60%; padding: 12px;">
+                <i class="fas fa-shower" style="font-size: 20px; color: #3498db; margin-bottom: 5px;"></i>
+                <div style="font-weight: 600; font-size: 15px;">Wash & Dry Only</div>
+            </div>
         </div>
 
         <label>Choose Stylist</label>
         <div class="stylist-grid">
-            <div class="stylist-card active" onclick="selectStylist('Louis', this)">
+            <div class="stylist-card" onclick="selectStylist('Louis', this)">
                 <i class="fas fa-user-tie"></i>
                 <div>Louis</div>
             </div>
@@ -310,6 +317,14 @@
             <div class="stylist-card" onclick="selectStylist('Prame', this)">
                 <i class="fas fa-user-tie"></i>
                 <div>Prame</div>
+            </div>
+            <div class="stylist-card" onclick="selectStylist('Chaway', this)">
+                <i class="fas fa-user-tie"></i>
+                <div>Chaway</div>
+            </div>
+            <div class="stylist-card" onclick="selectStylist('Test Account', this)">
+                <i class="fas fa-user-tie"></i>
+                <div>Test Account</div>
             </div>
         </div>
 
@@ -404,6 +419,18 @@
             Prame: {
                 M: { "Men cut": "1 hrs", "Down perm,Oppalock": "30 mins", "Perm men": "1 hrs", "Straightening men": "2 hrs", "Natural color men": "1 hrs", "Bleach color men": "4 hrs", "Men highlight color": "4 hrs", "Bangs trim": "30 mins" },
                 F: {}
+            },
+            Chaway: {
+                M: { "Men cut": "1 hrs", "Down perm,Oppalock": "30 mins", "Perm men": "1 hrs", "Straightening men": "2 hrs", "Natural color men": "1 hrs", "Bleach color men": "4 hrs", "Men highlight color": "4 hrs", "Bangs trim": "30 mins" },
+                F: {}
+            },
+            "Test Account": {
+                M: { "Men cut": "1 hrs", "Down perm,Oppalock": "30 mins", "Perm men": "1 hrs", "Straightening men": "2 hrs", "Natural color men": "1 hrs", "Bleach color men": "4 hrs", "Men highlight color": "4 hrs", "Bangs trim": "30 mins" },
+                F: { "Women cut": "1.30 hrs", "Perm women": "2 hrs", "Straightening women": "2 hrs", "Natural color women": "2 hrs", "Bleach color women": "5 hrs", "Women highlight color": "6 hrs", "Bangs trim": "30 mins" }
+            },
+            "Wash&Dry": {
+                M: { "Wash&Dry": "30 mins" },
+                F: { "Wash&Dry": "1 hrs" }
             }
         };
 
@@ -444,8 +471,10 @@
             document.getElementById('serviceInput').value = '';
             document.getElementById('durationInput').value = '';
             
-            // Re-apply visually if somehow kept, but we cleared it, so no active pills.
-            // Let the user select manually so they know what they are booking.
+            if (stylist === 'Wash&Dry' && Object.keys(services).length === 1) {
+                const btn = container.querySelector('.service-pill');
+                if (btn) btn.click();
+            }
         }
 
         // 2. UI Setters

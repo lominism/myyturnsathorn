@@ -5,7 +5,10 @@ const CALENDAR_IDS = {
   "Louis": "7b24bc8ff869f13afbf991ce4f63ca38a0f35901323e22f28d01e70494175f18@group.calendar.google.com",
   "Mile": "0c2d26f3d7de3dfacc5815f1f376f08f89ea9b9308a9a9de0464358cf64bbd95@group.calendar.google.com",
   "Mos": "eb78e8b7d97aef501f02c2dfef5c1c42545b08f61733c29f3578cda5263c81cf@group.calendar.google.com",
-  "Prame": "166ffbbe84d242afbb076ebb44de80ce5b2e468a8594f11aee5295703e4709e3@group.calendar.google.com"
+  "Prame": "166ffbbe84d242afbb076ebb44de80ce5b2e468a8594f11aee5295703e4709e3@group.calendar.google.com",
+  "Chaway": "0db57883884edf4de185e2b821382ff168508657082bb29ca38051f2f0c03963@group.calendar.google.com",
+  "Test Account": "89daaa6cd6f7200b864a6a07577250ede2541e0c7fa22844a765cd86e387cf34@group.calendar.google.com",
+  "Wash&Dry": "bd2634f75eb1c119876325e54d0822a3b164e82baa48cfe8d9cad4a331d903fb@group.calendar.google.com"
 };
 
 const ALL_SLOTS = [
@@ -186,6 +189,29 @@ function getAvailableTimes(stylist, date, serviceDurationMinutes) {
   var events = calendar.getEvents(dStart, dEnd);
   
   var occupiedSlots = []; 
+  
+  var now = new Date();
+  var todayStr = Utilities.formatDate(now, "GMT+7", "yyyy-MM-dd");
+  var isToday = (date === todayStr);
+  var currentMins = 0;
+  if (isToday) {
+    var h = parseInt(Utilities.formatDate(now, "GMT+7", "HH"), 10);
+    var m = parseInt(Utilities.formatDate(now, "GMT+7", "mm"), 10);
+    // Add 30 mins buffer so people can't instantly book the imminent slot
+    currentMins = h * 60 + m + 30; 
+  }
+
+  ALL_SLOTS.forEach(function(slotTime) {
+    if (isToday) {
+      var p = slotTime.split(":");
+      var slotStartMins = parseInt(p[0], 10) * 60 + parseInt(p[1], 10);
+      if (slotStartMins < currentMins) {
+         if (!occupiedSlots.includes(slotTime)) {
+             occupiedSlots.push(slotTime);
+         }
+      }
+    }
+  });
 
   events.forEach(function(event) {
     if (event.isAllDayEvent()) return;
@@ -290,7 +316,7 @@ function saveBooking(bookingData) {
   var timeStr = dayName + ", " + bookingData.time + "-" + endTimeStr;
 
   var genderInitial = bookingData.gender === "M" ? "M" : "W";
-  var genderLabel = bookingData.gender === "M" ? "Men hair cut" : "Women hair cut";
+  var genderLabel = bookingData.gender === "M" ? "Men's Hairstyles" : "Women's Hairstyles";
   var title = bookingData.name + " - " + genderInitial;
   
   var description = "Name: " + bookingData.name +
@@ -305,7 +331,9 @@ function saveBooking(bookingData) {
   });
   
   // 2. Format exact confirmation text
-  var fullMessage = "Booking Made\n\nYou have successfully made your appointment. Please wait for admin to make final confirmation.\n\n" + description;
+  var fullMessage = "Booking Made\n\nYou have successfully made your appointment. Please wait for admin to make final confirmation.\n\n" + 
+                    description + 
+                    "\n\nกรณีจองคิวเพื่อใช้บริการทางร้าน Myyturn Sathorn ในครั้งแรก ทางร้านขออนุญาตเก็บค่ามัดจำการจองคิว Haircut Services 500 บาท และ จะไม่มีค่ามัดจำในครั้งถัดไปค่ะ ☺️";
   
   // 3. Push Message via LINE API (only if we have their userId)
   var lineToken = "/MXTteuDdL/CR6iUlJfuerYo9kGTNln+8UDoYWHqPdCE+38NeFzWEgnsLEDOaZ1dKREeDwJy6biIoYtHU7ncuTIXsZboPjAGRqA/6eCmn30JyC4aIxms7KZpn3CUVJaMib0fAivwAjVstCMEgFkNAgdB04t89/1O/w1cDnyilFU="; // <--- UPDATE THIS
