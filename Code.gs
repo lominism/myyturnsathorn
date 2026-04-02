@@ -7,7 +7,6 @@ const CALENDAR_IDS = {
   "Mos": "eb78e8b7d97aef501f02c2dfef5c1c42545b08f61733c29f3578cda5263c81cf@group.calendar.google.com",
   "Prame": "166ffbbe84d242afbb076ebb44de80ce5b2e468a8594f11aee5295703e4709e3@group.calendar.google.com",
   "Chaway": "0db57883884edf4de185e2b821382ff168508657082bb29ca38051f2f0c03963@group.calendar.google.com",
-  "Test Account": "89daaa6cd6f7200b864a6a07577250ede2541e0c7fa22844a765cd86e387cf34@group.calendar.google.com",
   "Wash&Dry": "bd2634f75eb1c119876325e54d0822a3b164e82baa48cfe8d9cad4a331d903fb@group.calendar.google.com"
 };
 
@@ -197,8 +196,8 @@ function getAvailableTimes(stylist, date, serviceDurationMinutes) {
   if (isToday) {
     var h = parseInt(Utilities.formatDate(now, "GMT+7", "HH"), 10);
     var m = parseInt(Utilities.formatDate(now, "GMT+7", "mm"), 10);
-    // Add 30 mins buffer so people can't instantly book the imminent slot
-    currentMins = h * 60 + m + 30; 
+    // Use exact current time without buffer
+    currentMins = h * 60 + m; 
   }
 
   ALL_SLOTS.forEach(function(slotTime) {
