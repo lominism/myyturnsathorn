@@ -102,10 +102,20 @@ function getMonthStatus(stylist, year, month) {
   var dailyBookedMinutes = {}; 
 
   events.forEach(function(event) {
-    if (event.isAllDayEvent()) return;
-    
     var eventStart = event.getStartTime();
     var eventEnd = event.getEndTime();
+
+    if (event.isAllDayEvent()) {
+      var s = eventStart.getTime();
+      var e = eventEnd.getTime();
+      // All day events end at midnight the day after. Loop through each day it spans.
+      for (var t = s; t < e; t += 24 * 60 * 60 * 1000) {
+        var dStr = Utilities.formatDate(new Date(t), "GMT+7", "yyyy-MM-dd");
+        if (!dailyBookedMinutes[dStr]) dailyBookedMinutes[dStr] = 0;
+        dailyBookedMinutes[dStr] += 9999; // block the entire day by exceeding capacity
+      }
+      return;
+    }
     
     var formattedDate = Utilities.formatDate(eventStart, "GMT+7", "yyyy-MM-dd");
     
@@ -213,7 +223,15 @@ function getAvailableTimes(stylist, date, serviceDurationMinutes) {
   });
 
   events.forEach(function(event) {
-    if (event.isAllDayEvent()) return;
+    if (event.isAllDayEvent()) {
+      // If it's an all-day event, push every single slot into the occupied list
+      for (var i = 0; i < ALL_SLOTS.length; i++) {
+        if (!occupiedSlots.includes(ALL_SLOTS[i])) {
+          occupiedSlots.push(ALL_SLOTS[i]);
+        }
+      }
+      return;
+    }
     
     var eventStartStr = Utilities.formatDate(event.getStartTime(), "GMT+7", "HH:mm");
     var eventEndStr = Utilities.formatDate(event.getEndTime(), "GMT+7", "HH:mm");
@@ -312,7 +330,8 @@ function saveBooking(bookingData) {
   var dayName = days[startDate.getDay()];
   
   var endTimeStr = Utilities.formatDate(endDate, "GMT+7", "HH:mm");
-  var timeStr = dayName + ", " + bookingData.time + "-" + endTimeStr;
+  var dateStr = Utilities.formatDate(startDate, "GMT+7", "dd/MM/yyyy");
+  var timeStr = dayName + " " + dateStr + ", " + bookingData.time + "-" + endTimeStr;
 
   var genderInitial = bookingData.gender === "M" ? "M" : "W";
   var genderLabel = bookingData.gender === "M" ? "Men's Hairstyles" : "Women's Hairstyles";
