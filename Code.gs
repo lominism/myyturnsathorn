@@ -10,6 +10,8 @@ const CALENDAR_IDS = {
   "Wash&Dry": "bd2634f75eb1c119876325e54d0822a3b164e82baa48cfe8d9cad4a331d903fb@group.calendar.google.com"
 };
 
+const ADMIN_LINE_USER_ID = "U64c6bfc04462368648f7649155086fdc";
+
 const ALL_SLOTS = [
   "11:00", "11:30", "12:00", "12:30", "13:00", "13:30",
   "14:00", "14:30", "15:00", "15:30", "16:00", "16:30",
@@ -340,6 +342,7 @@ function saveBooking(bookingData) {
   var description = "Name: " + bookingData.name +
                     "\nPhone: " + bookingData.phone + 
                     "\n" + genderLabel +
+                    "\nStylist: " + bookingData.stylist +
                     "\nService: " + bookingData.service +
                     "\nTime: " + timeStr;
   
@@ -349,9 +352,14 @@ function saveBooking(bookingData) {
   });
   
   // 2. Format exact confirmation text
-  var fullMessage = "Booking Made\n\nYou have successfully made your appointment. Please wait for admin to make final confirmation.\n\n" + 
+  var fullMessage = "Booking Made\n" +
+                    "You have successfully made your appointment. Please wait for admin to make final confirmation.\n\n" + 
                     description + 
-                    "\n\nกรณีจองคิวเพื่อใช้บริการทางร้าน Myyturn Sathorn ในครั้งแรก ทางร้านขออนุญาตเก็บค่ามัดจำการจองคิว Haircut Services 500 บาท และ จะไม่มีค่ามัดจำในครั้งถัดไปค่ะ ☺️";
+                    "\n\nสำหรับการจองคิวใช้บริการครั้งแรกกับทางร้าน Myyturn Sathorn ทางร้านขออนุญาตเรียกเก็บค่ามัดจำสำหรับบริการ Haircut จำนวน 500 บาท\n\n" +
+                    "รายละเอียดบัญชีสำหรับโอนมัดจำ\n\n" +
+                    "บัญชี: บริษัท มายเทิร์น สาทร จำกัด\n" +
+                    "เลขที่บัญชี: 203-1-63832-4\n\n" +
+                    "หลังจากโอนเงินเรียบร้อยแล้ว กรุณาแนบสลิปการโอนเงินเพื่อยืนยันการจองคิวขอบคุณค่ะ🙏🏻☺️";
   
   // 3. Push Message via LINE API (only if we have their userId)
   var lineToken = "/MXTteuDdL/CR6iUlJfuerYo9kGTNln+8UDoYWHqPdCE+38NeFzWEgnsLEDOaZ1dKREeDwJy6biIoYtHU7ncuTIXsZboPjAGRqA/6eCmn30JyC4aIxms7KZpn3CUVJaMib0fAivwAjVstCMEgFkNAgdB04t89/1O/w1cDnyilFU="; // <--- UPDATE THIS
@@ -380,6 +388,32 @@ function saveBooking(bookingData) {
         pushDebug = "LINE API Response: " + response.getResponseCode() + " " + response.getContentText();
     } catch(e) {
         pushDebug = "Apps Script Error: " + e.message;
+    }
+  }
+
+  // 3b. Push Message to ADMIN
+  if (ADMIN_LINE_USER_ID && lineToken !== "PASTE_YOUR_LINE_CHANNEL_ACCESS_TOKEN_HERE") {
+    var adminUrl = 'https://api.line.me/v2/bot/message/push';
+    var adminPayload = {
+      'to': ADMIN_LINE_USER_ID,
+      'messages': [{
+        'type': 'text',
+        'text': "📢 New Booking Alert!\n\n" + fullMessage
+      }]
+    };
+    var adminOptions = {
+      'headers': {
+        'Content-Type': 'application/json',
+        'Authorization': 'Bearer ' + lineToken
+      },
+      'method': 'post',
+      'payload': JSON.stringify(adminPayload),
+      'muteHttpExceptions': true
+    };
+    try {
+        UrlFetchApp.fetch(adminUrl, adminOptions);
+    } catch(e) {
+        Logger.log("Admin Push Error: " + e.message);
     }
   }
 

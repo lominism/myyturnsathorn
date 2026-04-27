@@ -25,7 +25,15 @@
         <h1>Booking Made</h1>
         <p>You have successfully made your appointment. Please wait for admin to make final confirmation.</p>
         <div class="details-box" id="detailsBox">Loading details...</div>
-        <p style="margin-top: 25px; color: #7f8c8d; font-size: 13px;" id="countdownMessage">Window will close automatically in 3 seconds...</p>
+        
+        <div style="margin-top: 20px; text-align: left; background: #fffde7; border: 1px solid #fff59d; border-radius: 12px; padding: 15px; font-size: 13px; color: #5d4037;">
+            <strong style="display: block; margin-bottom: 8px; color: #795548;">รายละเอียดบัญชีสำหรับโอนมัดจำ</strong>
+            <div>บัญชี: บริษัท มายเทิร์น สาทร จำกัด</div>
+            <div>เลขที่บัญชี: 203-1-63832-4</div>
+            <div style="margin-top: 8px; font-style: italic;">*กรุณาแนบสลิปเพื่อยืนยันการจอง</div>
+        </div>
+
+        <p style="margin-top: 25px; color: #7f8c8d; font-size: 13px;" id="countdownMessage">Window will close automatically in 30 seconds...</p>
     </div>
 
     <script>
@@ -43,7 +51,7 @@
             try {
                 await liff.init({ liffId: "2009535614-MwZCCysW" });
                 
-                let secondsLeft = 3;
+                let secondsLeft = 30;
                 const counterElement = document.getElementById('countdownMessage');
                 
                 const timer = setInterval(() => {
@@ -61,8 +69,8 @@
                 
             } catch (err) {
                 console.error("LIFF SDK error:", err);
-                // If LIFF fails, fallback to standard window close (often blocked by browsers, but good practice)
-                setTimeout(() => { window.close(); }, 3000);
+                // If LIFF fails, fallback to standard window close
+                setTimeout(() => { window.close(); }, 30000);
             }
         });
     </script>
