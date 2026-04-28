@@ -347,7 +347,9 @@ function saveBooking(bookingData) {
                     "\nTime: " + timeStr;
   
   // 1. Send Booking to Google Calendar
-  calendar.createEvent(title, startDate, endDate, {
+  // We will create the event AFTER we send the line messages, so we can log the pushDebug to the calendar description!
+  // However, since we need to save the booking first, let's keep it here but we can update it later.
+  var event = calendar.createEvent(title, startDate, endDate, {
       description: description
   });
   
@@ -392,6 +394,7 @@ function saveBooking(bookingData) {
   }
 
   // 3b. Push Message to ADMIN
+  Utilities.sleep(500); // Wait 500ms before sending the second message
   if (ADMIN_LINE_USER_ID && lineToken !== "PASTE_YOUR_LINE_CHANNEL_ACCESS_TOKEN_HERE") {
     var adminUrl = 'https://api.line.me/v2/bot/message/push';
     var adminPayload = {
@@ -417,6 +420,11 @@ function saveBooking(bookingData) {
     }
   }
 
+  // 3c. Append debug info to calendar description
+  try {
+      event.setDescription(description + "\n\n--- DEBUG INFO ---\n" + pushDebug);
+  } catch(e) {}
+  
   // 4. Return Data Object directly to doPost
   return { details: description, debugInfo: pushDebug };
 }
