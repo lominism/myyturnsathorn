@@ -420,11 +420,6 @@ function saveBooking(bookingData) {
     }
   }
 
-  // 3c. Append debug info to calendar description
-  try {
-      event.setDescription(description + "\n\n--- DEBUG INFO ---\n" + pushDebug);
-  } catch(e) {}
-  
   // 4. Return Data Object directly to doPost
   return { details: description, debugInfo: pushDebug };
 }
