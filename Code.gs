@@ -355,10 +355,10 @@ function saveBooking(bookingData) {
   });
   
   // 2. Format exact confirmation text
-  var fullMessage = "Booking Made\n" +
-                    "You have successfully made your appointment. Please wait for admin to make final confirmation.\n\n" + 
-                    description + 
-                    "\n\nสำหรับการจองคิวใช้บริการครั้งแรกกับทางร้าน Myyturn Sathorn ทางร้านขออนุญาตเรียกเก็บค่ามัดจำสำหรับบริการ Haircut จำนวน 500 บาท\n\n" +
+  var fullMessage = "Booking Made ✅\n" +
+                    "You have successfully made your appointment.\n\n" +
+                    description +
+                    "\n\n📌สำหรับการจองคิวใช้บริการครั้งแรกกับทางร้าน Myyturn Sathorn ทางร้านขออนุญาตเรียกเก็บค่ามัดจำสำหรับบริการ Haircut จำนวน 500 บาท\n\n" +
                     "รายละเอียดบัญชีสำหรับโอนมัดจำ\n\n" +
                     "บัญชี: บริษัท มายเทิร์น สาทร จำกัด\n" +
                     "ธนาคาร: กสิกรไทย\n" +
