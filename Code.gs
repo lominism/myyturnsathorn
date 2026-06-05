@@ -7,6 +7,7 @@ const CALENDAR_IDS = {
   "Mos": "eb78e8b7d97aef501f02c2dfef5c1c42545b08f61733c29f3578cda5263c81cf@group.calendar.google.com",
   "Prame": "166ffbbe84d242afbb076ebb44de80ce5b2e468a8594f11aee5295703e4709e3@group.calendar.google.com",
   "Chaway": "0db57883884edf4de185e2b821382ff168508657082bb29ca38051f2f0c03963@group.calendar.google.com",
+  "Mark": "c7f3bdd605d073044c565ae33e3c89909057f86a3c8873f3aa10823120fe9fa4@group.calendar.google.com",
   "Wash&Dry": "bd2634f75eb1c119876325e54d0822a3b164e82baa48cfe8d9cad4a331d903fb@group.calendar.google.com"
 };
 

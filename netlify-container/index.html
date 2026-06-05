@@ -322,6 +322,10 @@
                 <i class="fas fa-user-tie"></i>
                 <div>Chaway</div>
             </div>
+            <div class="stylist-card" onclick="selectStylist('Mark', this)">
+                <i class="fas fa-user-tie"></i>
+                <div>Mark</div>
+            </div>
         </div>
 
         <label>Service</label>
@@ -360,26 +364,37 @@
             try {
                 await liff.init({ liffId: "2009535614-MwZCCysW" });
                 const welcomeDiv = document.getElementById('welcomeMessage');
-                
-                if (liff.isLoggedIn()) {
-                    const profile = await liff.getProfile();
-                    document.getElementById('lineUserId').value = profile.userId;
-                    
-                    // Show Welcome Message
-                    welcomeDiv.innerText = "Welcome, " + profile.displayName;
-                    welcomeDiv.style.display = "block";
-                    welcomeDiv.style.color = "#05a546";
-                    
-                    // Pre-fill name
-                    if (!document.getElementById('nameInput').value) {
-                        document.getElementById('nameInput').value = profile.displayName;
+
+                if (!liff.isLoggedIn()) {
+                    if (liff.isInClient()) {
+                        liff.login();
+                        return;
                     }
-                } else {
-                    // Always show the login button. Google Apps Script iframes block automatic liff.login() redirects.
                     welcomeDiv.innerText = "Please log in with LINE to book.";
                     welcomeDiv.style.display = "block";
                     welcomeDiv.style.color = "#e67e22";
                     document.getElementById('liffLoginBtn').style.display = "block";
+                    return;
+                }
+
+                const profile = await liff.getProfile();
+                document.getElementById('lineUserId').value = profile.userId;
+
+                welcomeDiv.innerText = "Welcome, " + profile.displayName;
+                welcomeDiv.style.display = "block";
+                welcomeDiv.style.color = "#05a546";
+
+                if (!document.getElementById('nameInput').value) {
+                    document.getElementById('nameInput').value = profile.displayName;
+                }
+
+                if (liff.isInClient() && !sessionStorage.getItem("bookingSent")) {
+                    try {
+                        await liff.sendMessages([{ type: "text", text: "Booking" }]);
+                        sessionStorage.setItem("bookingSent", "true");
+                    } catch (err) {
+                        console.error("sendMessages failed", err);
+                    }
                 }
             } catch (err) {
                 console.error("LIFF failed", err);
@@ -398,7 +413,7 @@
         const SERVICE_DATA = {
             Louis: {
                 M: { "Men cut": "1 hrs", "Down perm,Oppalock": "30 mins", "Perm men": "1 hrs", "Straightening men": "2 hrs", "Natural color men": "1 hrs", "Bleach color men": "4 hrs", "Men highlight color": "4 hrs", "Bangs trim": "30 mins" },
-                F: { "Women cut": "2 hrs", "Perm women": "2 hrs", "Straightening women": "2 hrs", "Natural color women": "2 hrs", "Bleach color women": "5 hrs", "Women highlight color": "6 hrs", "Bangs trim": "30 mins" }
+                F: { "Women cut": "1.30 hrs", "Perm women": "2 hrs", "Straightening women": "2 hrs", "Natural color women": "2 hrs", "Bleach color women": "5 hrs", "Women highlight color": "6 hrs", "Bangs trim": "30 mins" }
             },
             Mos: {
                 M: { "Men cut": "1 hrs", "Down perm,Oppalock": "30 mins", "Perm men": "1 hrs", "Straightening men": "2 hrs", "Natural color men": "1 hrs", "Bleach color men": "4 hrs", "Men highlight color": "4 hrs", "Bangs trim": "30 mins" },
@@ -410,13 +425,17 @@
             },
             Mile: {
                 M: { "Men cut": "1 hrs", "Down perm,Oppalock": "30 mins", "Perm men": "1 hrs", "Straightening men": "2 hrs", "Natural color men": "1 hrs", "Bleach color men": "4 hrs", "Men highlight color": "4 hrs", "Bangs trim": "30 mins" },
-                F: {}
+                F: { "Women cut": "2 hrs", "Perm women": "2 hrs", "Straightening women": "2 hrs", "Natural color women": "2 hrs", "Bleach color women": "5 hrs", "Women highlight color": "6 hrs", "Bangs trim": "30 mins" }
             },
             Prame: {
                 M: { "Men cut": "1 hrs", "Down perm,Oppalock": "30 mins", "Perm men": "1 hrs", "Straightening men": "2 hrs", "Natural color men": "1 hrs", "Bleach color men": "4 hrs", "Men highlight color": "4 hrs", "Bangs trim": "30 mins" },
-                F: {}
+                F: { "Women cut": "2 hrs", "Perm women": "2 hrs", "Straightening women": "2 hrs", "Natural color women": "2 hrs", "Bleach color women": "5 hrs", "Women highlight color": "6 hrs", "Bangs trim": "30 mins" }
             },
             Chaway: {
+                M: { "Men cut": "1 hrs", "Down perm,Oppalock": "30 mins", "Perm men": "1 hrs", "Straightening men": "2 hrs", "Natural color men": "1 hrs", "Bleach color men": "4 hrs", "Men highlight color": "4 hrs", "Bangs trim": "30 mins" },
+                F: {}
+            },
+            Mark: {
                 M: { "Men cut": "1 hrs", "Down perm,Oppalock": "30 mins", "Perm men": "1 hrs", "Straightening men": "2 hrs", "Natural color men": "1 hrs", "Bleach color men": "4 hrs", "Men highlight color": "4 hrs", "Bangs trim": "30 mins" },
                 F: {}
             },
